@@ -41,15 +41,15 @@ void AGDPlayerController::CreateHUD()
 	// Set attributes
 	UIHUDWidget->SetCurrentHealth(PS->GetHealth());
 	UIHUDWidget->SetMaxHealth(PS->GetMaxHealth());
-	UIHUDWidget->SetHealthPercentage(PS->GetHealth() / PS->GetMaxHealth());
+	UIHUDWidget->SetHealthPercentage(PS->GetHealth() / FMath::Max<float>(PS->GetMaxHealth(), 1.f));
 	UIHUDWidget->SetCurrentMana(PS->GetMana());
 	UIHUDWidget->SetMaxMana(PS->GetMaxMana());
-	UIHUDWidget->SetManaPercentage(PS->GetMana() / PS->GetMaxMana());
+	UIHUDWidget->SetManaPercentage(PS->GetMana() / FMath::Max<float>(PS->GetMaxMana(), 1.f));
 	UIHUDWidget->SetHealthRegenRate(PS->GetHealthRegenRate());
 	UIHUDWidget->SetManaRegenRate(PS->GetManaRegenRate());
 	UIHUDWidget->SetCurrentStamina(PS->GetStamina());
 	UIHUDWidget->SetMaxStamina(PS->GetMaxStamina());
-	UIHUDWidget->SetStaminaPercentage(PS->GetStamina() / PS->GetMaxStamina());
+	UIHUDWidget->SetStaminaPercentage(PS->GetStamina() / FMath::Max<float>(PS->GetMaxStamina(), 1.f));
 	UIHUDWidget->SetStaminaRegenRate(PS->GetStaminaRegenRate());
 	UIHUDWidget->SetExperience(PS->GetXP());
 	UIHUDWidget->SetGold(PS->GetGold());
@@ -67,15 +67,18 @@ UGDHUDWidget * AGDPlayerController::GetHUD()
 	return UIHUDWidget;
 }
 
-void AGDPlayerController::ShowDamageNumber_Implementation(float DamageAmount, AGDCharacterBase * TargetCharacter)
+void AGDPlayerController::ShowDamageNumber_Implementation(float DamageAmount, AGDCharacterBase* TargetCharacter)
 {
-	UGDDamageTextWidgetComponent* DamageText = NewObject<UGDDamageTextWidgetComponent>(TargetCharacter, DamageNumberClass);
-	DamageText->RegisterComponent();
-	DamageText->AttachToComponent(TargetCharacter->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
-	DamageText->SetDamageText(DamageAmount);
+	if (TargetCharacter)
+	{
+		UGDDamageTextWidgetComponent* DamageText = NewObject<UGDDamageTextWidgetComponent>(TargetCharacter, DamageNumberClass);
+		DamageText->RegisterComponent();
+		DamageText->AttachToComponent(TargetCharacter->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+		DamageText->SetDamageText(DamageAmount);
+	}
 }
 
-bool AGDPlayerController::ShowDamageNumber_Validate(float DamageAmount, AGDCharacterBase * TargetCharacter)
+bool AGDPlayerController::ShowDamageNumber_Validate(float DamageAmount, AGDCharacterBase* TargetCharacter)
 {
 	return true;
 }
@@ -94,7 +97,7 @@ bool AGDPlayerController::SetRespawnCountdown_Validate(float RespawnTimeRemainin
 }
 
 // Server only
-void AGDPlayerController::OnPossess(APawn * InPawn)
+void AGDPlayerController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
